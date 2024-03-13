@@ -1,0 +1,32 @@
+{
+  "name": "todo-list_use_electron",
+  "version": "1.0.0",
+  "description": "simple todo-list",
+  "author": "Morink Chou",
+  "devDependencies": {
+    "electron": "^29.1.1",
+    "electron-builder": "^24.13.3"
+  },
+  "files": [
+    "main.js",
+    "index.html",
+    "renderer.js"
+  ],
+  "main": "main.js",
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": "assets"
+    }
+  ],
+  "build": {
+    "appId": "com.example.app",
+    "productName": "MyApp",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

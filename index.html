@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <style>
+    /* CSS 样式 */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .todo-item {
+      margin-bottom: 10px;
+    }
+    .completed {
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+  <h1>Todo List</h1>
+  <div id="todo-container"></div>
+  <input type="text" id="taskInput" placeholder="Add new task">
+  <button onclick="addTask()">Add Task</button>
+
+  <script>
+    // JavaScript 代码
+    const todoContainer = document.getElementById('todo-container');
+    const apiUrl = 'http://localhost:3030/api';
+
+    // 获取所有任务并显示
+    async function displayTodos() {
+      todoContainer.innerHTML = '';
+      const response = await fetch(`${apiUrl}/todos`);
+      const todos = await response.json();
+
+      todos.forEach(todo => {
+        const todoItem = document.createElement('div');
+        todoItem.classList.add('todo-item');
+        todoItem.innerHTML = `
+          <input type="checkbox" onchange="toggleCompletion('${todo._id}')" ${todo.isFinish ? 'checked' : ''}>
+          <span class="${todo.isFinish ? 'completed' : ''}">${todo.task}</span>
+          <button onclick="deleteTask('${todo._id}')">Delete</button>
+        `;
+        todoContainer.appendChild(todoItem);
+      });
+    }
+
+    // 添加任务
+    async function addTask() {
+      const taskInput = document.getElementById('taskInput');
+      const task = taskInput.value.trim();
+      if (task === '') return;
+
+      const response = await fetch(`${apiUrl}/todos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ task })
+      });
+
+      if (response.ok) {
+        taskInput.value = '';
+        displayTodos();
+      }
+    }
+
+    // 标记任务完成
+    async function toggleCompletion(taskId) {
+      const response = await fetch(`${apiUrl}/todos/${taskId}`, {
+        method: 'PUT'
+      });
+
+      if (response.ok) {
+        displayTodos();
+      }
+    }
+
+    // 删除任务
+    async function deleteTask(taskId) {
+      const response = await fetch(`${apiUrl}/todos/${taskId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        displayTodos();
+      }
+    }
+
+    // 页面加载完成时显示所有任务
+    displayTodos();
+  </script>
+</body>
+</html>
